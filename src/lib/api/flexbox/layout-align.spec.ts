@@ -23,16 +23,19 @@ import {
   makeExpectDOMFrom,
   expectNativeEl
 } from '../../utils/testing/helpers';
+import {Platform} from '@angular/cdk/platform';
 
 describe('layout-align directive', () => {
   let fixture: ComponentFixture<any>;
   let matchMedia: MockMatchMedia;
+  let platform: Platform;
   let expectDOMFrom = makeExpectDOMFrom(() => TestLayoutAlignComponent);
   let createTestComponent = (template: string) => {
     fixture = makeCreateTestComponent(() => TestLayoutAlignComponent)(template);
 
-    inject([MatchMedia], (_matchMedia: MockMatchMedia) => {
+    inject([MatchMedia, Platform], (_matchMedia: MockMatchMedia, _platform: Platform) => {
       matchMedia = _matchMedia;
+      platform = _platform;
     })();
   };
 
@@ -45,7 +48,8 @@ describe('layout-align directive', () => {
       declarations: [TestLayoutAlignComponent],
       providers: [
         BreakPointRegistry, DEFAULT_BREAKPOINTS_PROVIDER,
-        {provide: MatchMedia, useClass: MockMatchMedia}
+        {provide: MatchMedia, useClass: MockMatchMedia},
+        Platform
       ]
     });
   });
@@ -99,10 +103,11 @@ describe('layout-align directive', () => {
         );
       });
       it('should add correct styles for `fxLayoutAlign="space-evenly"` usage', () => {
+        createTestComponent(`<div fxLayoutAlign='space-evenly'></div>`);
+
         // Safari does not appear to support this property
-        const isSafari = /safari/i.test(navigator.userAgent);
-        if ( !isSafari ) {
-          expectDOMFrom(`<div fxLayoutAlign='space-evenly'></div>`).toHaveStyle(
+        if (platform.SAFARI) {
+          expectNativeEl(fixture).toHaveStyle(
               extendObject({'justify-content': 'space-evenly'}, CROSSAXIS_DEFAULTS)
           );
         }

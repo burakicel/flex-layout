@@ -46,7 +46,8 @@ function hasStyle(element: any,
   let value = getStyle(element, styleName) || '';
   if ( !value && !inlineOnly ) {
     // Search stylesheets
-    value = getComputedStyle(element).getPropertyValue(styleName) || '';
+    value = typeof getComputedStyle === 'function' &&
+      getComputedStyle(element).getPropertyValue(styleName) || '';
   }
   return styleValue ? value == styleValue : value.length > 0;
 }

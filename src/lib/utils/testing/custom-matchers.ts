@@ -242,7 +242,7 @@ function buildCompareStyleFunction(inlineOnly = true) {
  * (Safari, IE, etc) will use prefixed style instead of defaults.
  */
 function hasPrefixedStyles(actual, key, value, inlineOnly) {
-  const current = {}, computed = getComputedStyle(actual);
+  const current = {}, computed = typeof getComputedStyle === 'function' && getComputedStyle(actual);
 
   value = value !== '*' ? value.trim() : undefined;
   let elHasStyle = _.hasStyle(actual, key, value, inlineOnly);
@@ -251,7 +251,7 @@ function hasPrefixedStyles(actual, key, value, inlineOnly) {
     Object.keys(prefixedStyles).forEach(prop => {
       // Search for optional prefixed values
       elHasStyle = elHasStyle || _.hasStyle(actual, prop, prefixedStyles[prop], inlineOnly);
-      if (!elHasStyle) {
+      if (!elHasStyle && computed) {
         current[prop] = computed.getPropertyValue(prop);
       }
     });
